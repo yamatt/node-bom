@@ -1,0 +1,37 @@
+{
+  "name": "node-bom",
+  "version": "0.0.1",
+  "description": "A Binary Object Manager server",
+  "author": "Matt Copperwaite (matt@copperwaite.net)",
+  "dependencies": {
+    "express": "4.10.x",
+    "mocha": ">=1.0.0",
+    "should": "4.3.x",
+    "morgan": "1.5.x",
+    "debug": "2.1.x",
+    "supertest": "0.15.x"
+    
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/yamatt/node-bom.git"
+  },
+  "homepage": "http://github.com/yamatt/node-bom",
+  "bugs": "http://github.com/yamatt/node-bom/issues",
+  "maintainers": [
+    {
+      "name": "Matt Copperwaite",
+      "email": "matt@copperwaite.net",
+      "web": "http://copperwaite.net/"
+    }
+  ],
+  "scripts": {
+    "test": "NODE_ENV=test ./node_modules/.bin/mocha",
+    "start": "node ./bom/bin/www"
+  },
+  "licenses": [
+    {
+      "type": "AGPLv3"
+    }
+  ]
+}
