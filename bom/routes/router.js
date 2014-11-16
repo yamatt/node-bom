@@ -1,6 +1,7 @@
 routes = {
-    "index": "/",
-    "new": "/"
+    "meta": "/",
+    "creation": "/",
+    "object": "/",
 }
 
 module.exports = function (app) {

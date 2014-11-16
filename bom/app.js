@@ -2,12 +2,32 @@ var express = require('express');
 var path = require('path');
 var logger = require('morgan');
 
+var getRawBody = require('raw-body')
+
 var router = require('./routes/router');
 
 var app = express();
 
 // uncomment after placing your favicon in /public
 app.use(logger('dev'));
+
+// get content somehow
+app.use(function (req, res, next) {
+  getRawBody(req,
+    {
+        length: req.headers['content-length'],
+    },
+    function (err, string) {
+        if (!err) {
+            req.body = string;
+            next()
+        }
+        else {
+          return next(new Error(err))
+        }
+
+    });
+});
 
 // break out in to module
 router(app);
