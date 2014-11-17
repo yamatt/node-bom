@@ -1,16 +1,23 @@
 var app = require('../bom/app');
 var should = require('should');
 var request = require('supertest');
+var fs = require('fs');
+
+var TEST_FILE_DIR = __dirname + "/files"
     
 describe('API',function(){
 
   before(function(done){
-    var server = app.listen(app.get('port'), done);
+    fs.mkdir(TEST_FILE_DIR, function () {
+        var server = app.set("file-dir", TEST_FILE_DIR).listen(app.get('port'), done);
+    });
   });
   
-  afterEach(function (done, a) {
-      // remove any files created
+  afterEach(function (done) {
+    // need to recusively delete the directory or pass through the name of the files created and delete them
+    //fs.rmdir(TEST_FILE_DIR, function () {
       done()
+    //});
   });
 
   it('GET / should return 200',function(done){

@@ -8,8 +8,16 @@ var router = require('./routes/router');
 
 var app = express();
 
-// uncomment after placing your favicon in /public
+// configuration
 app.use(logger('dev'));
+
+app.set("routes", {
+    "meta": "/",
+    "creation": "/",
+    "object": "/",
+});
+
+app.set("file-dir", __dirname + "/files");
 
 // get content somehow
 app.use(function (req, res, next) {
@@ -29,7 +37,7 @@ app.use(function (req, res, next) {
     });
 });
 
-// break out in to module
+// set up routing
 router(app);
 
 // catch 404 and forward to error handler
