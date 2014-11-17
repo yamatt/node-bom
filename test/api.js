@@ -48,10 +48,15 @@ describe('API',function(){
       });
   });
   
-  it('GET /notexist should return 404',function(done){
+  it('Non-permitted files should return 404',function(done){
     request(app)
-      .get('/id')
-      .expect(404, done);
+      .get('/notexist')
+      .expect(404);
+    request(app)
+      .get('/../LICENSE')
+      .expect(404);
+      
+    done();
   });
   
   it('should be able to place an object and get it back in return',function(done){
