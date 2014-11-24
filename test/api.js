@@ -2,6 +2,7 @@ var app = require('../bom/app');
 var should = require('should');
 var request = require('supertest');
 var fs = require('fs');
+var url = require('url');
 
 var TEST_FILE_DIR = __dirname + "/files"
     
@@ -59,19 +60,45 @@ describe('API',function(){
     done();
   });
   
-  it('should be able to place an object and get it back in return',function(done){
+  it('should be able to post an object and for it to be written',function(done){
+    request(app)
+        .post('/')
+        .send("example data")
+        .set('Content-Type','multipart/encrypted')
+        .expect('Content-Type', /json/)
+        .end(function (err, res) {
+            var path = TEST_FILE_DIR + "/" + res.body.id
+            fs.exists(path, function(exists) {
+                if (exists) {
+                    fs.readFile(path, "utf-8", function (err, data) {
+                        if (!err) {
+                            data.should.equal("example data");
+                            done();
+                        }
+                        else {
+                            throw new Error("Could not open file: " + path);
+                        }
+                    });
+                }
+                else {
+                    throw new Error("File '" + path + "' does not exist.");
+                }
+            });
+        });
+    });
+    
+  it('POST / should return valid bom URL',function(done){
     request(app)
       .post('/')
       .send("example data")
       .set('Content-Type','multipart/encrypted')
-      .expect('Content-Type', /json/)
+      .set('BOM-APPLICATION-URI','bom://test.example.com')
       .end(function (err, res) {
-          request(app)
-          .get("/"+ res.body.id)
-          .expect(200)
-          .expect("example data");
-          done()
-
+          var bom_url = url.parse(res.body.id);
+          bom_url.protocol.should.equal("bom");
+          bom_url.host.should.equal("test.example.com");
+          bom_url.pathname.should.exist();
+          done();
       });
   });
 });
