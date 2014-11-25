@@ -26,38 +26,26 @@ describe('API',function(){
       .get('/')
       .expect(200,done);
   });
-
-  it('POST / should return 201',function(done){
-    request(app)
-      .post('/')
-      .send("example data")
-      .set('Content-Type','multipart/encrypted')
-      .expect(201,done);
-  });
   
-  it('POST / should return valid json',function(done){
+  it('POST / should return valid bom json',function(done){
     request(app)
       .post('/')
       .send("example data")
       .set('Content-Type','multipart/encrypted')
+      .set('BOM-APPLICATION-URI','bom://test.example.com')
       .expect('Content-Type', /json/)
+      .expect(201)
       .end(function (err, res) {
           res.body.should.be.ok;
           res.body.should.be.an.instanceof(Object);
           res.body.should.have.property('id');
+          
+          var bom_url = url.parse(res.body.id);
+          bom_url.protocol.should.equal("bom:");
+          bom_url.host.should.equal("test.example.com");
+          bom_url.pathname.should.not.equal(null);
           done();
       });
-  });
-  
-  it('Non-permitted files should return 404',function(done){
-    request(app)
-      .get('/notexist')
-      .expect(404);
-    request(app)
-      .get('/../LICENSE')
-      .expect(404);
-      
-    done();
   });
   
   it('should be able to post an object and for it to be written',function(done){
@@ -65,9 +53,11 @@ describe('API',function(){
         .post('/')
         .send("example data")
         .set('Content-Type','multipart/encrypted')
+        .set('BOM-APPLICATION-URI','bom://test.example.com')
         .expect('Content-Type', /json/)
         .end(function (err, res) {
-            var path = TEST_FILE_DIR + "/" + res.body.id
+            var uri = url.parse(res.body.id);
+            var path = TEST_FILE_DIR + "/" + uri.host + "/" + uri.pathname;
             fs.exists(path, function(exists) {
                 if (exists) {
                     fs.readFile(path, "utf-8", function (err, data) {
@@ -87,19 +77,16 @@ describe('API',function(){
         });
     });
     
-  it('POST / should return valid bom URL',function(done){
+  it('should 404 on non-existent files',function(done){
     request(app)
-      .post('/')
-      .send("example data")
-      .set('Content-Type','multipart/encrypted')
-      .set('BOM-APPLICATION-URI','bom://test.example.com')
-      .end(function (err, res) {
-          var bom_url = url.parse(res.body.id);
-          bom_url.protocol.should.equal("bom");
-          bom_url.host.should.equal("test.example.com");
-          bom_url.pathname.should.exist();
-          done();
-      });
+      .get('/notexist')
+      .expect(404, done);
+  });
+  
+  it('should 404 on files out-side scope',function(done){
+    request(app)
+      .get('/../LICENSE')
+      .expect(404, done);
   });
 });
 
